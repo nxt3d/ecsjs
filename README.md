@@ -27,16 +27,22 @@ ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum 
 
 ## Installation
 
-Since this library is not yet published to npm, you can install it directly from the repository:
+Install the package from npm:
 
 ```bash
-npm install git+https://github.com/your-org/ecs-resolver.git viem
+npm install @nxt3d/ecs-resolver viem
+```
+
+Or install directly from the repository:
+
+```bash
+npm install git+https://github.com/nxt3d/ecs-resolver.git viem
 ```
 
 Or clone and install locally:
 
 ```bash
-git clone https://github.com/your-org/ecs-resolver.git
+git clone https://github.com/nxt3d/ecs-resolver.git
 cd ecs-resolver
 npm install
 ```
@@ -48,7 +54,7 @@ npm install
 ```typescript
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
-import { createECSResolver } from 'ecs-resolver'
+import { createECSResolver } from '@nxt3d/ecs-resolver'
 
 // Create a Viem public client
 const publicClient = createPublicClient({
@@ -68,27 +74,7 @@ const result = await resolver.resolveNameCredential(
 console.log(result.value) // e.g., "2"
 ```
 
-## How ECS Works
-
-ECS uses ENS to resolve credentials by constructing special ENS names:
-
-### Name-based Credentials
-For ENS names or DNS domains:
-```
-{name}.name.ecs.eth
-```
-**Example**: `vitalik.eth.name.ecs.eth`
-
-### Address-based Credentials
-For Ethereum addresses:
-```
-{address}.{coinType}.addr.ecs.eth
-```
-**Example**: `d8da6bf26964af9d7eed9e03e53415d37aa96045.3c.addr.ecs.eth`
-
-The library then queries these ENS names for text records using the credential key (e.g., `eth.ecs.ethstars.stars`).
-
-## API Reference
+## Usage
 
 ### Creating a Resolver
 
@@ -97,7 +83,7 @@ The library then queries these ENS names for text records using the credential k
 Creates a new ECS resolver instance.
 
 ```typescript
-import { createECSResolver } from 'ecs-resolver'
+import { createECSResolver } from '@nxt3d/ecs-resolver'
 
 const resolver = createECSResolver({
   publicClient,           // Viem PublicClient (required)
@@ -220,7 +206,7 @@ import {
   constructENSName,
   parseCredentialKey,
   validateCredentialKey
-} from 'ecs-resolver'
+} from '@nxt3d/ecs-resolver'
 
 // Create identifiers
 const nameId = createNameIdentifier('vitalik.eth')
@@ -250,7 +236,7 @@ import {
   InvalidCredentialKeyError,
   ResolutionTimeoutError,
   ENSResolutionError
-} from 'ecs-resolver'
+} from '@nxt3d/ecs-resolver'
 
 try {
   const result = await resolver.resolveNameCredential(
@@ -281,17 +267,6 @@ if (!result.success) {
 }
 ```
 
-## Supported Coin Types
-
-For address-based credentials, the following coin types are supported:
-
-| Coin Type | Blockchain | Hex Value |
-|-----------|------------|-----------|
-| Ethereum  | ETH        | `3c`      |
-| Bitcoin   | BTC        | `0`       |
-| Litecoin  | LTC        | `2`       |
-| Bitcoin Cash | BCH     | `91`      |
-
 ## Examples
 
 ### Basic Usage
@@ -299,7 +274,7 @@ For address-based credentials, the following coin types are supported:
 ```typescript
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
-import { createECSResolver } from 'ecs-resolver'
+import { createECSResolver } from '@nxt3d/ecs-resolver'
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -411,18 +386,6 @@ ecs-resolver/
 npm run lint
 npm run lint:fix
 ```
-
-## ECS Deployment
-
-ECS is currently deployed on the **Sepolia testnet**. For production use, you'll need to wait for mainnet deployment or deploy your own instance.
-
-### Sepolia Testnet Contracts
-
-| Contract | Address | Etherscan |
-|----------|---------|-----------|
-| ECSRegistry | `0x360728b13Dfc832333beF3E4171dd42BdfCedC92` | [View](https://sepolia.etherscan.io/address/0x360728b13Dfc832333beF3E4171dd42BdfCedC92) |
-| ECSNameResolver | `0xa8e8443f3bbaf7c903764cbc9602134a6bfec2b2` | [View](https://sepolia.etherscan.io/address/0xa8e8443f3bbaf7c903764cbc9602134a6bfec2b2) |
-| ECSAddressResolver | `0x2ffdf34ed40171cce860020ea37c9f1854e0995e` | [View](https://sepolia.etherscan.io/address/0x2ffdf34ed40171cce860020ea37c9f1854e0995e) |
 
 ## Contributing
 
