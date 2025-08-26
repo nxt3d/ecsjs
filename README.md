@@ -30,13 +30,13 @@ ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum 
 Install the package from npm:
 
 ```bash
-npm install @nxt3d/ecs-resolver viem
+npm install @nxt3d/ecs-resolver
 ```
 
 Or install directly from the repository:
 
 ```bash
-npm install git+https://github.com/nxt3d/ecs-resolver.git viem
+npm install git+https://github.com/nxt3d/ecs-resolver.git
 ```
 
 Or clone and install locally:
@@ -47,7 +47,7 @@ cd ecs-resolver
 npm install
 ```
 
-**Note**: `viem` is a peer dependency and must be installed separately.
+**Note**: `viem` is a peer dependency and will be installed automatically if not already present.
 
 ## Quick Start
 
