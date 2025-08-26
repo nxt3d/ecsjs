@@ -1,0 +1,69 @@
+{
+  "name": "@ecs/resolver",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "TypeScript library for resolving ECS (Ethereum Credential Service) credentials using Viem",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage --run",
+    "test:onchain": "node tests/onchain.test.js",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ethereum",
+    "ecs",
+    "credentials",
+    "ens",
+    "viem",
+    "typescript",
+    "blockchain"
+  ],
+  "author": "ECS Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/ecs-resolver"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/ecs-resolver/issues"
+  },
+  "homepage": "https://github.com/your-org/ecs-resolver#readme",
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "viem": "^2.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  }
+}
