@@ -21,7 +21,6 @@ import {
 import {
   constructENSName,
   validateCredentialRequest,
-  parseCredentialKey,
   DEFAULT_ECS_DOMAIN
 } from './utils'
 
@@ -75,7 +74,7 @@ export class ECSResolver {
       const value = await Promise.race([resolutionPromise, timeoutPromise])
 
       return {
-        value,
+        value: value,
         ensName,
         credentialKey,
         success: value !== null
@@ -162,14 +161,7 @@ export class ECSResolver {
     )
   }
 
-  /**
-   * Gets credential metadata by parsing the credential key
-   * @param credentialKey - The credential key to parse
-   * @returns The parsed credential metadata
-   */
-  getCredentialMetadata(credentialKey: string) {
-    return parseCredentialKey(credentialKey)
-  }
+
 
   /**
    * Constructs the ENS name that would be used for resolution
@@ -198,8 +190,52 @@ export class ECSResolver {
         key: credentialKey
       })
 
-      // Return the text record value, or null if empty
-      return textRecord && textRecord.trim() !== '' ? textRecord.trim() : null
+      // Return the text record value, or null if empty  
+      if (!textRecord) {
+        return null
+      }
+
+      // Convert to string and trim, handling potential buffer/byte array issues
+      let cleanValue: string
+      
+      if (typeof textRecord === 'string') {
+        // Clean up control characters and null bytes
+        cleanValue = textRecord.replace(/[\x00-\x1F\x7F]/g, '').trim()
+      } else if (textRecord && typeof textRecord === 'object') {
+        // Handle case where viem returns a buffer or byte array
+        try {
+          const bufferValue = Buffer.from(textRecord as any).toString('utf8')
+          // Clean up control characters and null bytes
+          cleanValue = bufferValue.replace(/[\x00-\x1F\x7F]/g, '').trim()
+        } catch {
+          const stringValue = String(textRecord)
+          // Clean up control characters and null bytes
+          cleanValue = stringValue.replace(/[\x00-\x1F\x7F]/g, '').trim()
+        }
+      } else {
+        const stringValue = String(textRecord)
+        // Clean up control characters and null bytes
+        cleanValue = stringValue.replace(/[\x00-\x1F\x7F]/g, '').trim()
+      }
+      
+      if (cleanValue === '') {
+        return null
+      }
+      
+      // Check if the value is hex-encoded (starts with 0x)
+      if (cleanValue.startsWith('0x')) {
+        try {
+          // Decode hex to string
+          const bytes = cleanValue.slice(2) // Remove '0x' prefix
+          const decoded = Buffer.from(bytes, 'hex').toString('utf8').trim()
+          return decoded || null
+        } catch (error) {
+          // If hex decoding fails, return the original value
+          return cleanValue
+        }
+      }
+      
+      return cleanValue
     } catch (error) {
       // Handle specific Viem errors
       if (error instanceof Error) {

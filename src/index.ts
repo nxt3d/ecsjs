@@ -27,7 +27,11 @@
  */
 
 // Export main resolver class and factory
-export { ECSResolver, createECSResolver } from './resolver'
+export { ECSResolver } from './resolver'
+
+// Export main resolver (unified API)
+export { createECSResolver } from './ecs-resolver'
+export type { ResolverConfig, Resolver } from './ecs-resolver'
 
 // Export all types
 export type {
@@ -48,8 +52,7 @@ export type {
   BatchCredentialResult,
   
   // Metadata types
-  ECSNamespace,
-  CredentialMetadata
+  ECSNamespace
 } from './types'
 
 // Export error classes
@@ -73,8 +76,7 @@ export {
   validateCredentialKey,
   validateCredentialRequest,
   
-  // Parsing utilities
-  parseCredentialKey,
+
   
   // Factory functions
   createNameIdentifier,

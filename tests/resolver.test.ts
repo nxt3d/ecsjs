@@ -212,17 +212,7 @@ describe('ECSResolver', () => {
     })
   })
 
-  describe('getCredentialMetadata', () => {
-    it('should parse credential metadata', () => {
-      const metadata = resolver.getCredentialMetadata('eth.ecs.ethstars.stars')
-      
-      expect(metadata).toEqual({
-        key: 'eth.ecs.ethstars.stars',
-        namespace: 'ethstars',
-        name: 'stars'
-      })
-    })
-  })
+
 
   describe('getENSName', () => {
     it('should return ENS name for name identifier', () => {

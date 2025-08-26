@@ -1,6 +1,6 @@
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
-import { createECSResolver } from '../dist/index.mjs'
+import { createECSResolver } from '../dist/index.js'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -43,7 +43,7 @@ const main = async () => {
     console.log("🔍 Name-based Resolution");
     console.log("------------------------");
     
-    const nameResult = await resolver.resolveNameCredential(ensName, credentialKey)
+    const nameResult = await resolver.resolveWithDetails(ensName, credentialKey)
     console.log(`📍 ENS Name: ${nameResult.ensName}`);
     
     if (nameResult.success) {
@@ -58,7 +58,7 @@ const main = async () => {
     console.log("🔍 Address-based Resolution");
     console.log("---------------------------");
     
-    const addressResult = await resolver.resolveAddressCredential(walletAddress, credentialKey)
+    const addressResult = await resolver.resolveAddressWithDetails(walletAddress, credentialKey)
     console.log(`📍 ENS Name: ${addressResult.ensName}`);
     
     if (addressResult.success) {

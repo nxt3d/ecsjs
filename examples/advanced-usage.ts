@@ -4,13 +4,13 @@
  * This example demonstrates advanced features and use cases of the ECS resolver library.
  */
 
+import 'dotenv/config'
 import { createPublicClient, http } from 'viem'
 import { mainnet, sepolia } from 'viem/chains'
 import { 
   createECSResolver,
   createNameIdentifier,
   createAddressIdentifier,
-  parseCredentialKey,
   constructENSName,
   type CredentialIdentifier
 } from '../src/index'
@@ -19,15 +19,47 @@ async function advancedUsageExample() {
   console.log('🔬 ECS Resolver - Advanced Usage Example')
   console.log('========================================\n')
 
+  console.log('🚀 Simple Mode Examples')
+  console.log('---------------------')
+  
+  // Create resolvers in simple mode for different networks
+  const simpleSepoliaResolver = createECSResolver({ network: 'sepolia' })
+  const simpleMainnetResolver = createECSResolver({ network: 'mainnet' })
+
+  try {
+    // Simple mode usage
+    const simpleResult = await simpleSepoliaResolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
+    console.log(`   Simple mode result: ${simpleResult}`)
+    
+    // Simple mode with custom RPC
+    const customResolver = createECSResolver({ 
+      network: 'sepolia',
+      rpcUrl: 'https://custom-rpc.sepolia.org'
+    })
+    console.log('   Custom RPC resolver created')
+  } catch (error) {
+    console.log(`   Simple mode error: ${error}`)
+  }
+
+  console.log('\n🔧 Advanced Mode Examples')
+  console.log('----------------------')
+  
   // Create clients for different networks
+  if (!process.env.SEPOLIA_RPC_URL) {
+    console.log('⚠️  Warning: SEPOLIA_RPC_URL not set in .env file. Using fallback RPC.')
+  }
+  if (!process.env.MAINNET_RPC_URL) {
+    console.log('⚠️  Warning: MAINNET_RPC_URL not set in .env file. Using fallback RPC.')
+  }
+
   const sepoliaClient = createPublicClient({
     chain: sepolia,
-    transport: http(process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org')
+    transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
   })
 
   const mainnetClient = createPublicClient({
     chain: mainnet,
-    transport: http(process.env.MAINNET_RPC_URL || 'https://rpc.ankr.com/eth')
+    transport: http(process.env.MAINNET_RPC_URL || 'https://eth-mainnet.g.alchemy.com/v2/demo')
   })
 
   // Create resolvers for different networks
@@ -59,10 +91,7 @@ async function advancedUsageExample() {
   ]
 
   credentials.forEach(key => {
-    const metadata = parseCredentialKey(key)
-    console.log(`   ${key}:`)
-    console.log(`     Namespace: ${metadata.namespace}`)
-    console.log(`     Name: ${metadata.name}`)
+    console.log(`   ${key}`)
   })
 
   console.log('\n3️⃣ Constructing ENS names manually...')
@@ -124,8 +153,7 @@ async function advancedUsageExample() {
   
   console.log('   Multi-credential results:')
   multiResults.forEach((result, index) => {
-    const credentialName = parseCredentialKey(result.request.credentialKey).name
-    console.log(`     ${credentialName}: ${result.success ? result.value : 'Not found'}`)
+    console.log(`     ${result.request.credentialKey}: ${result.success ? result.value : 'Not found'}`)
   })
 
   console.log('\n6️⃣ Cross-chain resolution simulation...')
@@ -152,16 +180,9 @@ async function advancedUsageExample() {
   console.log('\n7️⃣ Utility function demonstrations...')
   
   // Demonstrate various utilities
-  console.log('   Getting metadata for complex credential:')
+  console.log('   Complex credential example:')
   const complexCredential = 'eth.ecs.defi.compound.v2.borrowed.usdc'
-  try {
-    const complexMetadata = parseCredentialKey(complexCredential)
-    console.log(`     Key: ${complexMetadata.key}`)
-    console.log(`     Namespace: ${complexMetadata.namespace}`)
-    console.log(`     Name: ${complexMetadata.name}`)
-  } catch (error) {
-    console.log(`     ❌ Invalid credential format: ${error}`)
-  }
+  console.log(`     Key: ${complexCredential}`)
 
   console.log('\n🎉 Advanced usage examples completed!')
 }

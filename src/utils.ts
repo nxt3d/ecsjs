@@ -8,7 +8,6 @@
 import type { 
   CredentialIdentifier, 
   CoinType, 
-  CredentialMetadata,
   NameCredentialIdentifier,
   AddressCredentialIdentifier 
 } from './types'
@@ -121,12 +120,12 @@ export function validateCredentialKey(credentialKey: string): void {
     throw new InvalidCredentialKeyError('Credential key cannot be empty')
   }
   
-  // Should follow the pattern: eth.ecs.namespace.credential
+  // Should follow the pattern: eth.ecs.namespace[.subnamespace].credential
   const parts = trimmedKey.split('.')
   
   if (parts.length < 4) {
     throw new InvalidCredentialKeyError(
-      `Invalid credential key format: ${credentialKey}. Expected format: eth.ecs.namespace.credential`
+      `Invalid credential key format: ${credentialKey}. Expected format: eth.ecs.namespace[.subnamespace].credential`
     )
   }
   
@@ -137,30 +136,7 @@ export function validateCredentialKey(credentialKey: string): void {
   }
 }
 
-/**
- * Parses a credential key into its components
- * @param credentialKey - The credential key to parse
- * @returns The parsed credential metadata
- */
-export function parseCredentialKey(credentialKey: string): CredentialMetadata {
-  validateCredentialKey(credentialKey)
-  
-  const parts = credentialKey.split('.')
-  
-  // Format: eth.ecs.namespace.credential (or eth.ecs.namespace.sub.credential)
-  // We take everything after 'eth.ecs' and before the last part as namespace
-  // The last part is the credential name
-  
-  const namespaceParts = parts.slice(2, -1)
-  const namespace = namespaceParts.join('.')
-  const name = parts[parts.length - 1]!
-  
-  return {
-    key: credentialKey,
-    namespace,
-    name
-  }
-}
+
 
 /**
  * Creates a name-based credential identifier

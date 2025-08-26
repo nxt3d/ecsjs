@@ -22,7 +22,7 @@ ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum 
 - 🎯 **Multiple Identifier Types**: Support for both name-based and address-based credentials
 - 🔄 **Batch Resolution**: Resolve multiple credentials efficiently
 - ⚡ **Error Handling**: Comprehensive error handling with custom error types
-- 🧪 **Well Tested**: 35 unit tests with 86.5% code coverage
+
 - 📦 **Dual Package**: Supports both CommonJS and ES modules
 
 ## Installation
@@ -33,162 +33,100 @@ Install the package from npm:
 npm install @nxt3d/ecs-resolver
 ```
 
-Or install directly from the repository:
-
-```bash
-npm install git+https://github.com/nxt3d/ecs-resolver.git
-```
-
-Or clone and install locally:
-
-```bash
-git clone https://github.com/nxt3d/ecs-resolver.git
-cd ecs-resolver
-npm install
-```
-
 **Note**: `viem` is a peer dependency and will be installed automatically if not already present.
 
 ## Quick Start
 
+### Main API
+
 ```typescript
-import { createPublicClient, http } from 'viem'
-import { sepolia } from 'viem/chains'
 import { createECSResolver } from '@nxt3d/ecs-resolver'
 
-// Create a Viem public client
-const publicClient = createPublicClient({
-  chain: sepolia, // ECS is currently deployed on Sepolia testnet
-  transport: http('https://rpc.sepolia.org')
-})
+// Simple mode - just specify the network
+const resolver = createECSResolver({ network: 'sepolia' })
 
-// Create the ECS resolver
-const resolver = createECSResolver({ publicClient })
+// Resolve by name
+const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
+console.log(stars) // e.g., "2"
 
-// Resolve a name-based credential
-const result = await resolver.resolveNameCredential(
-  'vitalik.eth',
+// Resolve by address
+const addressStars = await resolver.resolveAddress(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
+console.log(addressStars) // e.g., "2"
 
-console.log(result.value) // e.g., "2"
+// Advanced mode - use your existing viem client
+const advancedResolver = createECSResolver({ publicClient })
+
+// Get detailed results
+const details = await advancedResolver.resolveWithDetails('vitalik.eth', 'eth.ecs.ethstars.stars')
+console.log(details) // { value: "2", ensName: "...", success: true }
+```
+
+**Note**: For production use, provide your own RPC URL. The library doesn't load environment variables - that's your responsibility:
+```typescript
+import 'dotenv/config' // Load environment variables in your app
+const resolver = createECSResolver({ 
+  network: 'sepolia',
+  rpcUrl: process.env.SEPOLIA_RPC_URL 
+})
 ```
 
 ## Usage
 
-### Creating a Resolver
+### Main API
 
 #### `createECSResolver(config)`
 
-Creates a new ECS resolver instance.
+Creates an ECS resolver that adapts based on your configuration.
 
 ```typescript
 import { createECSResolver } from '@nxt3d/ecs-resolver'
 
-const resolver = createECSResolver({
-  publicClient,           // Viem PublicClient (required)
-  ecsDomain: 'ecs.eth'   // Custom ECS domain (optional, defaults to 'ecs.eth')
+// Simple mode - just specify the network
+const resolver = createECSResolver({ network: 'sepolia' })
+
+// With custom RPC URL
+const resolver = createECSResolver({ 
+  network: 'sepolia',
+  rpcUrl: process.env.SEPOLIA_RPC_URL // Load environment variables in your app
 })
+
+// Advanced mode - use your existing viem client
+const resolver = createECSResolver({ publicClient })
 ```
 
-### Resolving Credentials
-
-#### `resolveNameCredential(name, credentialKey, options?)`
-
-Resolves a credential for an ENS name or DNS domain.
+#### Resolver Methods
 
 ```typescript
-const result = await resolver.resolveNameCredential(
-  'vitalik.eth',
-  'eth.ecs.ethstars.stars',
-  {
-    timeout: 10000,      // Timeout in ms (default: 10000)
-    throwOnError: false  // Whether to throw on errors (default: false)
-  }
-)
-
-console.log(result)
-// {
-//   value: "2",
-//   ensName: "vitalik.eth.name.ecs.eth",
-//   credentialKey: "eth.ecs.ethstars.stars",
-//   success: true
-// }
-```
-
-#### `resolveAddressCredential(address, credentialKey, coinType?, options?)`
-
-Resolves a credential for an Ethereum address.
-
-```typescript
-const result = await resolver.resolveAddressCredential(
+// Simple methods (return string | null)
+const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
+const addressStars = await resolver.resolveAddress(
   '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars',
-  '3c' // Coin type (optional, defaults to '3c' for Ethereum)
-)
-```
-
-#### `resolveCredential(identifier, credentialKey, options?)`
-
-Generic method that works with both name and address identifiers.
-
-```typescript
-// Name-based
-const nameResult = await resolver.resolveCredential(
-  { type: 'name', name: 'vitalik.eth' },
   'eth.ecs.ethstars.stars'
 )
 
-// Address-based
-const addressResult = await resolver.resolveCredential(
-  { 
-    type: 'address', 
-    address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-    coinType: '3c'
-  },
+// Advanced methods (return full result objects)
+const details = await resolver.resolveWithDetails('vitalik.eth', 'eth.ecs.ethstars.stars')
+// Returns: { value: "2", ensName: "...", credentialKey: "...", success: true }
+
+const addressDetails = await resolver.resolveAddressWithDetails(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
-```
 
-#### `resolveCredentialsBatch(requests, options?)`
+// Batch operations for efficiency
+const batchResults = await resolver.resolveBatch([
+  { name: 'vitalik.eth', credential: 'eth.ecs.ethstars.stars' },
+  { name: 'alice.eth', credential: 'eth.ecs.ethstars.stars' }
+])
 
-Resolves multiple credentials in parallel.
+const addressBatchResults = await resolver.resolveAddressBatch([
+  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars' }
+])
 
-```typescript
-const requests = [
-  {
-    identifier: { type: 'name', name: 'vitalik.eth' },
-    credentialKey: 'eth.ecs.ethstars.stars'
-  },
-  {
-    identifier: { type: 'name', name: 'ethereum.eth' },
-    credentialKey: 'eth.ecs.ethstars.stars'
-  }
-]
-
-const results = await resolver.resolveCredentialsBatch(requests)
-```
-
-### Utility Methods
-
-#### `getCredentialMetadata(credentialKey)`
-
-Parses a credential key into its components.
-
-```typescript
-const metadata = resolver.getCredentialMetadata('eth.ecs.ethstars.stars')
-// {
-//   key: 'eth.ecs.ethstars.stars',
-//   namespace: 'ethstars',
-//   name: 'stars'
-// }
-```
-
-#### `getENSName(identifier)`
-
-Gets the ENS name that would be used for resolution.
-
-```typescript
+// Utility methods
 const ensName = resolver.getENSName({ type: 'name', name: 'vitalik.eth' })
 // "vitalik.eth.name.ecs.eth"
 ```
@@ -204,7 +142,6 @@ import {
   normalizeAddress,
   normalizeName,
   constructENSName,
-  parseCredentialKey,
   validateCredentialKey
 } from '@nxt3d/ecs-resolver'
 
@@ -216,18 +153,38 @@ const addressId = createAddressIdentifier('0xd8da6bf26964af9d7eed9e03e53415d37aa
 const normalizedAddr = normalizeAddress('0xD8DA6BF26964AF9D7EED9E03E53415D37AA96045')
 // "d8da6bf26964af9d7eed9e03e53415d37aa96045"
 
-// Construct ENS names
+// Construct ECS ENS names
 const ensName = constructENSName(nameId)
 // "vitalik.eth.name.ecs.eth"
 
-// Parse credential keys
-const metadata = parseCredentialKey('eth.ecs.ethstars.stars')
-// { key: '...', namespace: 'ethstars', name: 'stars' }
+
 ```
 
 ## Error Handling
 
-The library provides comprehensive error handling with custom error types:
+The library provides comprehensive error handling with both simple and detailed result methods:
+
+### Simple Error Handling
+
+```typescript
+import { createECSResolver } from '@nxt3d/ecs-resolver'
+
+const resolver = createECSResolver({ network: 'sepolia' })
+
+// Simple methods return null for failed resolution
+const result = await resolver.resolve('nonexistent.eth', 'eth.ecs.ethstars.stars')
+if (result === null) {
+  console.log('Credential not found')
+}
+
+// Get detailed error information
+const details = await resolver.resolveWithDetails('nonexistent.eth', 'eth.ecs.ethstars.stars')
+if (!details.success) {
+  console.log('Error:', details.error)
+}
+```
+
+### Advanced Error Handling
 
 ```typescript
 import {
@@ -239,11 +196,13 @@ import {
 } from '@nxt3d/ecs-resolver'
 
 try {
-  const result = await resolver.resolveNameCredential(
+  const result = await resolver.resolveWithDetails(
     'vitalik.eth',
-    'eth.ecs.ethstars.stars',
-    { throwOnError: true }
+    'eth.ecs.ethstars.stars'
   )
+  if (!result.success) {
+    console.log('Resolution failed:', result.error)
+  }
 } catch (error) {
   if (error instanceof InvalidIdentifierError) {
     console.log('Invalid identifier:', error.message)
@@ -254,43 +213,57 @@ try {
 }
 ```
 
-By default, errors are handled gracefully and returned in the result object:
-
-```typescript
-const result = await resolver.resolveNameCredential(
-  'nonexistent.eth',
-  'eth.ecs.ethstars.stars'
-)
-
-if (!result.success) {
-  console.log('Resolution failed:', result.error)
-}
-```
-
 ## Examples
 
 ### Basic Usage
 
 ```typescript
+import 'dotenv/config'
+import { createECSResolver } from '@nxt3d/ecs-resolver'
+
+// Create a resolver in simple mode
+const resolver = createECSResolver({ network: 'sepolia' })
+
+// Resolve by name
+const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
+
+// Resolve by address
+const addressStars = await resolver.resolveAddress(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+  'eth.ecs.ethstars.stars'
+)
+
+console.log('Stars:', stars)
+console.log('Address stars:', addressStars)
+```
+
+### Advanced Usage
+
+```typescript
+import 'dotenv/config'
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { createECSResolver } from '@nxt3d/ecs-resolver'
 
+// Custom viem configuration
 const publicClient = createPublicClient({
   chain: sepolia,
-  transport: http()
+  transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
 })
 
-const resolver = createECSResolver({ publicClient })
+// Advanced resolver with custom options
+const resolver = createECSResolver({ 
+  publicClient,
+  ecsDomain: 'custom.ecs.eth' // Custom ECS domain
+})
 
-// Resolve name-based credential
-const nameResult = await resolver.resolveNameCredential(
+// Get detailed results
+const nameResult = await resolver.resolveWithDetails(
   'vitalik.eth',
   'eth.ecs.ethstars.stars'
 )
 
-// Resolve address-based credential  
-const addressResult = await resolver.resolveAddressCredential(
+const addressResult = await resolver.resolveAddressWithDetails(
   '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
@@ -302,24 +275,17 @@ console.log('Address stars:', addressResult.value)
 ### Batch Resolution
 
 ```typescript
-const requests = [
-  {
-    identifier: { type: 'name', name: 'vitalik.eth' },
-    credentialKey: 'eth.ecs.ethstars.stars'
-  },
-  {
-    identifier: { type: 'name', name: 'ethereum.eth' },
-    credentialKey: 'eth.ecs.ethstars.stars'
-  }
-]
+// Resolve multiple credentials efficiently
+const batchResults = await resolver.resolveBatch([
+  { name: 'vitalik.eth', credential: 'eth.ecs.ethstars.stars' },
+  { name: 'alice.eth', credential: 'eth.ecs.ethstars.stars' }
+])
 
-const results = await resolver.resolveCredentialsBatch(requests)
-
-results.forEach((result, index) => {
-  if (result.success) {
-    console.log(`Request ${index + 1}: ${result.value} stars`)
+batchResults.forEach((result, index) => {
+  if (result !== null) {
+    console.log(`Request ${index + 1}: ${result} stars`)
   } else {
-    console.log(`Request ${index + 1}: Failed - ${result.error}`)
+    console.log(`Request ${index + 1}: Failed`)
   }
 })
 ```
@@ -327,25 +293,19 @@ results.forEach((result, index) => {
 ### Custom Configuration
 
 ```typescript
-// Use mainnet with custom timeout
-const mainnetClient = createPublicClient({
-  chain: mainnet,
-  transport: http('https://eth-mainnet.g.alchemy.com/v2/your-api-key')
-})
-
+// Use your existing viem client
 const resolver = createECSResolver({ 
   publicClient: mainnetClient,
   ecsDomain: 'ecs.eth'
 })
 
-const result = await resolver.resolveNameCredential(
+const result = await resolver.resolveWithDetails(
   'vitalik.eth',
-  'eth.ecs.ethstars.stars',
-  { 
-    timeout: 5000,
-    throwOnError: true
-  }
+  'eth.ecs.ethstars.stars'
 )
+```
+
+**Note**: The examples use Alchemy demo RPC URLs for simplicity. For production use, provide your own RPC URL. The library doesn't load environment variables - that's your responsibility.
 ```
 
 ## Development

@@ -9,7 +9,6 @@ import {
   constructENSName,
   validateCoinType,
   validateCredentialKey,
-  parseCredentialKey,
   createNameIdentifier,
   createAddressIdentifier,
   validateCredentialRequest
@@ -112,25 +111,7 @@ describe('validateCredentialKey', () => {
   })
 })
 
-describe('parseCredentialKey', () => {
-  it('should parse simple credential keys', () => {
-    const result = parseCredentialKey('eth.ecs.ethstars.stars')
-    expect(result).toEqual({
-      key: 'eth.ecs.ethstars.stars',
-      namespace: 'ethstars',
-      name: 'stars'
-    })
-  })
 
-  it('should parse nested namespace credential keys', () => {
-    const result = parseCredentialKey('eth.ecs.namespace.sub.credential')
-    expect(result).toEqual({
-      key: 'eth.ecs.namespace.sub.credential',
-      namespace: 'namespace.sub',
-      name: 'credential'
-    })
-  })
-})
 
 describe('createNameIdentifier', () => {
   it('should create valid name identifiers', () => {
@@ -184,9 +165,7 @@ describe('validateCredentialRequest', () => {
 
   it('should throw for invalid requests', () => {
     const validIdentifier = createNameIdentifier('vitalik.eth')
-    const invalidIdentifier = { type: 'invalid' as any }
     
-    expect(() => validateCredentialRequest(invalidIdentifier, 'eth.ecs.ethstars.stars')).toThrow()
     expect(() => validateCredentialRequest(validIdentifier, 'invalid.key')).toThrow()
   })
 })

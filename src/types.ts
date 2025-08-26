@@ -109,17 +109,7 @@ export interface ECSNamespace {
   active: boolean
 }
 
-/**
- * Credential metadata
- */
-export interface CredentialMetadata {
-  /** The full credential key (e.g., 'eth.ecs.ethstars.stars') */
-  key: string
-  /** The namespace part (e.g., 'ethstars') */
-  namespace: string
-  /** The credential name part (e.g., 'stars') */
-  name: string
-}
+
 
 /**
  * Error types that can occur during credential resolution

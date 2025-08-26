@@ -2,8 +2,10 @@
  * Basic Usage Example
  * 
  * This example demonstrates the basic functionality of the ECS resolver library.
+ * Shows the unified API that adapts based on your configuration.
  */
 
+import 'dotenv/config'
 import { createPublicClient, http } from 'viem'
 import { mainnet, sepolia } from 'viem/chains'
 import { createECSResolver } from '../src/index'
@@ -12,58 +14,107 @@ async function basicUsageExample() {
   console.log('🌟 ECS Resolver - Basic Usage Example')
   console.log('=====================================\n')
 
-  // Create a Viem public client for Sepolia testnet (where ECS is deployed)
-  const publicClient = createPublicClient({
-    chain: sepolia,
-    transport: http(process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org')
+  console.log('🚀 Simple Mode (Network Only)')
+  console.log('----------------------------')
+  
+  // Create a resolver in simple mode (no viem setup needed)
+  // For production, provide your own RPC URL
+  const simpleResolver = createECSResolver({ 
+    network: 'sepolia',
+    rpcUrl: process.env.SEPOLIA_RPC_URL // Load environment variables in your app
   })
 
-  // Create the ECS resolver
+  try {
+    console.log('📍 Simple Mode - Resolving name-based credential...')
+    console.log('   Name: vitalik.eth')
+    console.log('   Credential: eth.ecs.ethstars.stars')
+    
+    // Simple mode: just pass name and credential
+    const simpleNameResult = await simpleResolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
+    if (simpleNameResult !== null) {
+      console.log(`   ✅ Result: ${simpleNameResult} stars`)
+    } else {
+      console.log('   ❌ Not found')
+    }
+
+    console.log('\n📍 Simple Mode - Resolving address-based credential...')
+    console.log('   Address: 0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
+    console.log('   Credential: eth.ecs.ethstars.stars')
+    const simpleAddressResult = await simpleResolver.resolveAddress(
+      '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      'eth.ecs.ethstars.stars'
+    )
+    if (simpleAddressResult !== null) {
+      console.log(`   ✅ Result: ${simpleAddressResult} stars`)
+    } else {
+      console.log('   ❌ Not found')
+    }
+  } catch (error) {
+    console.error('❌ Simple mode error:', error)
+  }
+
+  console.log('\n🔧 Advanced Mode (Custom viem Client)')
+  console.log('------------------------------------')
+  
+  // Create a Viem public client for Sepolia testnet (where ECS is deployed)
+  // For production, provide your own RPC URL
+  const publicClient = createPublicClient({
+    chain: sepolia,
+    transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
+  })
+
+  // Create the resolver in advanced mode
   const resolver = createECSResolver({ publicClient })
 
   try {
-    console.log('📍 Resolving name-based credential...')
+    console.log('📍 Advanced Mode - Resolving name-based credential...')
+    console.log('   Name: vitalik.eth')
+    console.log('   Credential: eth.ecs.ethstars.stars')
     
     // Resolve a name-based credential for vitalik.eth
-    const nameResult = await resolver.resolveNameCredential(
+    const nameResult = await resolver.resolveWithDetails(
       'vitalik.eth',
       'eth.ecs.ethstars.stars'
     )
 
-    console.log('Result:', nameResult)
     if (nameResult.success) {
-      console.log(`✅ vitalik.eth has ${nameResult.value} stars!`)
+      console.log(`   ENS Name: ${nameResult.ensName}`)
+      console.log(`   ✅ Result: ${nameResult.value} stars`)
     } else {
-      console.log('❌ Could not resolve credential')
+      console.log('   ❌ Could not resolve credential')
+      if (nameResult.error) {
+        console.log(`   Error: ${nameResult.error}`)
+      }
     }
 
-    console.log('\n📍 Resolving address-based credential...')
+    console.log('\n📍 Advanced Mode - Resolving address-based credential...')
+    console.log('   Address: 0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
+    console.log('   Credential: eth.ecs.ethstars.stars')
     
     // Resolve an address-based credential
-    const addressResult = await resolver.resolveAddressCredential(
+    const addressResult = await resolver.resolveAddressWithDetails(
       '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
       'eth.ecs.ethstars.stars'
     )
 
-    console.log('Result:', addressResult)
     if (addressResult.success) {
-      console.log(`✅ Address has ${addressResult.value} stars!`)
+      console.log(`   ENS Name: ${addressResult.ensName}`)
+      console.log(`   ✅ Result: ${addressResult.value} stars`)
     } else {
-      console.log('❌ Could not resolve credential')
+      console.log('   ❌ Could not resolve credential')
+      if (addressResult.error) {
+        console.log(`   Error: ${addressResult.error}`)
+      }
     }
 
-    console.log('\n📍 Getting credential metadata...')
-    const metadata = resolver.getCredentialMetadata('eth.ecs.ethstars.stars')
-    console.log('Metadata:', metadata)
-
-    console.log('\n📍 Constructing ENS names...')
+    console.log('\n📍 Utility - Constructing ENS names...')
     const nameENS = resolver.getENSName({ type: 'name', name: 'vitalik.eth' })
     const addressENS = resolver.getENSName({
       type: 'address',
       address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
     })
-    console.log('Name ENS:', nameENS)
-    console.log('Address ENS:', addressENS)
+    console.log('   Name → ENS:', nameENS)
+    console.log('   Address → ENS:', addressENS)
 
   } catch (error) {
     console.error('❌ Error:', error)
