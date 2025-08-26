@@ -10,7 +10,9 @@ A TypeScript library for resolving **ECS (Ethereum Credential Service)** credent
 
 ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum for storing, retrieving, and verifying digital credentials. It enables applications to create custom credentials with guaranteed namespace ownership and flexible on-chain/off-chain data storage.
 
-**Example**: Query how many "stars" `vitalik.eth` has received using the credential `eth.ecs.ethstars.stars` (currently returns "2").
+**⚠️ Important**: ECS is currently deployed on **Ethereum Sepolia testnet** only. This library is designed to work with the testnet deployment.
+
+**Example**: Query how many "stars" `vitalik.eth` has received using the credential `eth.ecs.ethstars.stars` (currently returns "2" on Sepolia testnet).
 
 ## Features
 
@@ -432,10 +434,10 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Links
 
-- [ECS Protocol Documentation](https://github.com/your-org/ecs) (link to be updated)
+- [ECS Protocol Repository](https://github.com/nxt3d/ecs)
 - [Viem Documentation](https://viem.sh/)
 - [ENS Documentation](https://docs.ens.domains/)
 
 ---
 
-**Note**: ECS is currently in beta on Sepolia testnet. The library has been tested with real credentials and works correctly. Use at your own risk in production environments.
+**Note**: ECS is currently in beta on Ethereum Sepolia testnet. The library has been tested with real credentials and works correctly. Use at your own risk in production environments.
