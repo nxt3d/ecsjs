@@ -1,5 +1,5 @@
 {
-  "name": "ecs-resolver-examples",
+  "name": "ecsjs-examples",
   "version": "1.0.0",
   "description": "Examples for using the ECS resolver library",
   "type": "module",

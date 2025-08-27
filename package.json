@@ -1,5 +1,5 @@
 {
-  "name": "@nxt3d/ecs-resolver",
+  "name": "ecsjs",
   "version": "0.1.4",
   "type": "module",
   "description": "TypeScript library for resolving ECS (Ethereum Credential Service) credentials using Viem",
@@ -44,12 +44,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nxt3d/ecs-resolver"
+    "url": "https://github.com/nxt3d/ecsjs"
   },
   "bugs": {
-    "url": "https://github.com/nxt3d/ecs-resolver/issues"
+    "url": "https://github.com/nxt3d/ecsjs/issues"
   },
-  "homepage": "https://github.com/nxt3d/ecs-resolver#readme",
+  "homepage": "https://github.com/nxt3d/ecsjs#readme",
   "peerDependencies": {
     "viem": "^2.0.0"
   },
