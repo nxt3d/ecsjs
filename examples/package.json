@@ -1,5 +1,5 @@
 {
-  "name": "ecsjs-examples",
+  "name": "ecs-js-examples",
   "version": "1.0.0",
   "description": "Examples for using the ecs.js library",
   "type": "module",

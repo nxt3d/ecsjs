@@ -5,7 +5,7 @@
  * 
  * @example Basic Usage
  * ```typescript
- * import { createECSResolver, createNameIdentifier } from 'ecsjs'
+ * import { createECSResolver, createNameIdentifier } from 'ecs-js'
  * import { createPublicClient, http } from 'viem'
  * import { mainnet } from 'viem/chains'
  * 

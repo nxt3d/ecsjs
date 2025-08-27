@@ -1,5 +1,5 @@
 {
-  "name": "ecsjs",
+  "name": "ecs-js",
   "version": "0.1.4",
   "type": "module",
   "description": "TypeScript library for resolving ECS (Ethereum Credential Service) credentials using Viem",

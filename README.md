@@ -30,7 +30,7 @@ ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum 
 Install the package from npm:
 
 ```bash
-npm install ecsjs
+npm install ecs-js
 ```
 
 **Note**: `viem` is a peer dependency and will be installed automatically if not already present.
@@ -40,7 +40,7 @@ npm install ecsjs
 ### Main API
 
 ```typescript
-import { createECSResolver } from 'ecsjs'
+import { createECSResolver } from 'ecs-js'
 
 // Simple mode - just specify the network
 const resolver = createECSResolver({ network: 'sepolia' })
@@ -82,7 +82,7 @@ const resolver = createECSResolver({
 Creates an ECS resolver that adapts based on your configuration.
 
 ```typescript
-import { createECSResolver } from 'ecsjs'
+import { createECSResolver } from 'ecs-js'
 
 // Simple mode - just specify the network
 const resolver = createECSResolver({ network: 'sepolia' })
@@ -143,7 +143,7 @@ import {
   normalizeName,
   constructENSName,
   validateCredentialKey
-} from 'ecsjs'
+} from 'ecs-js'
 
 // Create identifiers
 const nameId = createNameIdentifier('vitalik.eth')
@@ -167,7 +167,7 @@ The library provides comprehensive error handling with both simple and detailed 
 ### Simple Error Handling
 
 ```typescript
-import { createECSResolver } from 'ecsjs'
+import { createECSResolver } from 'ecs-js'
 
 const resolver = createECSResolver({ network: 'sepolia' })
 
@@ -193,7 +193,7 @@ import {
   InvalidCredentialKeyError,
   ResolutionTimeoutError,
   ENSResolutionError
-} from 'ecsjs'
+} from 'ecs-js'
 
 try {
   const result = await resolver.resolveWithDetails(
@@ -219,7 +219,7 @@ try {
 
 ```typescript
 import 'dotenv/config'
-import { createECSResolver } from 'ecsjs'
+import { createECSResolver } from 'ecs-js'
 
 // Create a resolver in simple mode
 const resolver = createECSResolver({ network: 'sepolia' })
@@ -243,7 +243,7 @@ console.log('Address stars:', addressStars)
 import 'dotenv/config'
 import { createPublicClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
-import { createECSResolver } from 'ecsjs'
+import { createECSResolver } from 'ecs-js'
 
 // Custom viem configuration
 const publicClient = createPublicClient({
@@ -331,7 +331,7 @@ npm run test:onchain
 ### Test Structure
 
 ```
-ecsjs/
+ecs-js/
 ├── src/                    # Source code
 ├── tests/                  # All tests
 │   ├── utils.test.ts      # Unit tests for utilities
