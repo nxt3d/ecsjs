@@ -1,7 +1,7 @@
 /**
  * Error Handling Example
  * 
- * This example demonstrates proper error handling with the ECS resolver library.
+ * This example demonstrates proper error handling with the ecs.js library.
  */
 
 import 'dotenv/config'
@@ -17,7 +17,7 @@ import {
 } from '../src/index'
 
 async function errorHandlingExample() {
-  console.log('⚠️  ECS Resolver - Error Handling Example')
+  console.log('⚠️  ecs.js - Error Handling Example')
   console.log('=========================================\n')
 
   console.log('🚀 Simple Mode Error Handling')
@@ -51,7 +51,7 @@ async function errorHandlingExample() {
     transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
   })
 
-  // Create the ECS resolver in advanced mode
+  // Create the ecs.js resolver in advanced mode
   const resolver = createECSResolver({ publicClient })
 
   // Example 1: Non-existent credential

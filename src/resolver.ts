@@ -1,5 +1,5 @@
 /**
- * ECS Resolver - Core Library
+ * ecs.js - Core Library
  * 
  * This module provides the main ECSResolver class that wraps Viem functionality
  * for resolving ECS (Ethereum Credential Service) credentials.
@@ -25,7 +25,7 @@ import {
 } from './utils'
 
 /**
- * Main ECS Resolver class that provides methods for resolving credentials
+ * Main ecs.js class that provides methods for resolving credentials
  */
 export class ECSResolver {
   private readonly publicClient

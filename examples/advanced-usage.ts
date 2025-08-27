@@ -1,7 +1,7 @@
 /**
  * Advanced Usage Example
  * 
- * This example demonstrates advanced features and use cases of the ECS resolver library.
+ * This example demonstrates advanced features and use cases of the ecs.js library.
  */
 
 import 'dotenv/config'
@@ -16,7 +16,7 @@ import {
 } from '../src/index'
 
 async function advancedUsageExample() {
-  console.log('🔬 ECS Resolver - Advanced Usage Example')
+  console.log('🔬 ecs.js - Advanced Usage Example')
   console.log('========================================\n')
 
   console.log('🚀 Simple Mode Examples')

@@ -1,11 +1,11 @@
 /**
- * ECS Resolver Library
+ * ecs.js Library
  * 
  * A TypeScript library for resolving ECS (Ethereum Credential Service) credentials using Viem.
  * 
  * @example Basic Usage
  * ```typescript
- * import { createECSResolver, createNameIdentifier } from '@ecs/resolver'
+ * import { createECSResolver, createNameIdentifier } from 'ecsjs'
  * import { createPublicClient, http } from 'viem'
  * import { mainnet } from 'viem/chains'
  * 

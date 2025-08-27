@@ -1,5 +1,5 @@
 /**
- * Unit tests for ECS resolver
+ * Unit tests for ecs.js
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'

@@ -10,7 +10,7 @@ import { sepolia } from 'viem/chains'
 import { createECSResolver } from '../src/index'
 
 async function batchResolutionExample() {
-  console.log('🚀 ECS Resolver - Batch Resolution Example')
+  console.log('🚀 ecs.js - Batch Resolution Example')
   console.log('==========================================\n')
 
   // Create a Viem public client for Sepolia testnet
@@ -23,7 +23,7 @@ async function batchResolutionExample() {
     transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
   })
 
-  // Create the ECS resolver
+  // Create the ecs.js resolver
   const resolver = createECSResolver({ publicClient })
 
   try {

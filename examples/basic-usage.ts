@@ -1,7 +1,7 @@
 /**
  * Basic Usage Example
  * 
- * This example demonstrates the basic functionality of the ECS resolver library.
+ * This example demonstrates the basic functionality of the ecs.js library.
  * Shows the unified API that adapts based on your configuration.
  */
 
@@ -11,7 +11,7 @@ import { mainnet, sepolia } from 'viem/chains'
 import { createECSResolver } from '../src/index'
 
 async function basicUsageExample() {
-  console.log('🌟 ECS Resolver - Basic Usage Example')
+  console.log('🌟 ecs.js - Basic Usage Example')
   console.log('=====================================\n')
 
   console.log('🚀 Simple Mode (Network Only)')

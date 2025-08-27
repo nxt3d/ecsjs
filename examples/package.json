@@ -1,7 +1,7 @@
 {
   "name": "ecsjs-examples",
   "version": "1.0.0",
-  "description": "Examples for using the ECS resolver library",
+  "description": "Examples for using the ecs.js library",
   "type": "module",
   "scripts": {
     "basic": "node basic-usage.js",

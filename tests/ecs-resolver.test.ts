@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { createECSResolver } from '../src/ecs-resolver'
 
-describe('ECS Resolver', () => {
+describe('ecs.js', () => {
   it('should create a resolver in simple mode with network', () => {
     const resolver = createECSResolver({ network: 'sepolia' })
     expect(resolver).toBeDefined()

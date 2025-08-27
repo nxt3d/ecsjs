@@ -1,4 +1,4 @@
-# ECS.js
+# ecs.js
 
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
