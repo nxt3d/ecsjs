@@ -50,9 +50,13 @@ export function normalizeAddress(address: string): string {
  * @throws InvalidIdentifierError if the coin type is invalid
  */
 export function validateCoinType(coinType: string): asserts coinType is CoinType {
-  const validCoinTypes: CoinType[] = ['3c', '0', '2', '91']
-  if (!validCoinTypes.includes(coinType as CoinType)) {
-    throw new InvalidIdentifierError(`Invalid coin type: ${coinType}. Supported types: ${validCoinTypes.join(', ')}`)
+  if (!coinType || typeof coinType !== 'string') {
+    throw new InvalidIdentifierError('Coin type must be a non-empty string')
+  }
+  
+  // Validate hex format (lowercase hex string)
+  if (!/^[0-9a-f]+$/.test(coinType)) {
+    throw new InvalidIdentifierError(`Invalid coin type format: ${coinType}. Must be a lowercase hex string (e.g., '3c', '0', 'a')`)
   }
 }
 

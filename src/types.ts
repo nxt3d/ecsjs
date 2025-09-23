@@ -15,8 +15,9 @@ export type CredentialIdentifierType = 'name' | 'address'
 /**
  * Supported coin types for address-based credentials
  * Using ENSIP-11 coin type values in lowercase hex
+ * Accepts any valid hex string for maximum flexibility
  */
-export type CoinType = '3c' | '0' | '2' | '91' // Ethereum, Bitcoin, Litecoin, Bitcoin Cash
+export type CoinType = string
 
 /**
  * Configuration for the ECS resolver

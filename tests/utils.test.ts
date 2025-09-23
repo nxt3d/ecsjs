@@ -58,12 +58,18 @@ describe('validateCoinType', () => {
     expect(() => validateCoinType('0')).not.toThrow()
     expect(() => validateCoinType('2')).not.toThrow()
     expect(() => validateCoinType('91')).not.toThrow()
+    expect(() => validateCoinType('a')).not.toThrow()
+    expect(() => validateCoinType('ff')).not.toThrow()
+    expect(() => validateCoinType('123')).not.toThrow()
   })
 
   it('should throw for invalid coin types', () => {
     expect(() => validateCoinType('invalid')).toThrow(InvalidIdentifierError)
-    expect(() => validateCoinType('60')).toThrow(InvalidIdentifierError)
-    expect(() => validateCoinType('3C')).toThrow(InvalidIdentifierError)
+    expect(() => validateCoinType('3C')).toThrow(InvalidIdentifierError) // uppercase
+    expect(() => validateCoinType('')).toThrow(InvalidIdentifierError) // empty
+    expect(() => validateCoinType('3g')).toThrow(InvalidIdentifierError) // invalid hex
+    expect(() => validateCoinType(null as any)).toThrow(InvalidIdentifierError)
+    expect(() => validateCoinType(undefined as any)).toThrow(InvalidIdentifierError)
   })
 })
 

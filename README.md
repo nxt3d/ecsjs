@@ -20,9 +20,9 @@ ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum 
 - 🔧 **Viem Integration**: Built on top of the popular Viem library
 - 📝 **TypeScript Support**: Full type safety and IntelliSense
 - 🎯 **Multiple Identifier Types**: Support for both name-based and address-based credentials
+- 🪙 **Multi-Currency Support**: Support for different coin types (Ethereum, Bitcoin, Litecoin, Bitcoin Cash)
 - 🔄 **Batch Resolution**: Resolve multiple credentials efficiently
 - ⚡ **Error Handling**: Comprehensive error handling with custom error types
-
 - 📦 **Dual Package**: Supports both CommonJS and ES modules
 
 ## Installation
@@ -49,12 +49,20 @@ const resolver = createECSResolver({ network: 'sepolia' })
 const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
 console.log(stars) // e.g., "2"
 
-// Resolve by address
+// Resolve by address (Ethereum - default)
 const addressStars = await resolver.resolveAddress(
   '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
 console.log(addressStars) // e.g., "2"
+
+// Resolve by address with specific coin type
+const bitcoinStars = await resolver.resolveAddress(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+  'eth.ecs.ethstars.stars',
+  '0' // Bitcoin coin type
+)
+console.log(bitcoinStars) // e.g., "1"
 
 // Advanced mode - use your existing viem client
 const advancedResolver = createECSResolver({ publicClient })
@@ -106,6 +114,11 @@ const addressStars = await resolver.resolveAddress(
   '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
+const bitcoinStars = await resolver.resolveAddress(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+  'eth.ecs.ethstars.stars',
+  '0' // Bitcoin coin type
+)
 
 // Advanced methods (return full result objects)
 const details = await resolver.resolveWithDetails('vitalik.eth', 'eth.ecs.ethstars.stars')
@@ -115,6 +128,11 @@ const addressDetails = await resolver.resolveAddressWithDetails(
   '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
   'eth.ecs.ethstars.stars'
 )
+const bitcoinDetails = await resolver.resolveAddressWithDetails(
+  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+  'eth.ecs.ethstars.stars',
+  '0' // Bitcoin coin type
+)
 
 // Batch operations for efficiency
 const batchResults = await resolver.resolveBatch([
@@ -123,12 +141,40 @@ const batchResults = await resolver.resolveBatch([
 ])
 
 const addressBatchResults = await resolver.resolveAddressBatch([
-  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars' }
+  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars' },
+  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars', coinType: '0' }
 ])
 
 // Utility methods
 const ensName = resolver.getENSName({ type: 'name', name: 'vitalik.eth' })
 // "vitalik.eth.name.ecs.eth"
+```
+
+### Supported Coin Types
+
+The library supports multiple cryptocurrency coin types for address-based credential resolution. Coin types are specified using their SLIP-0044 values in lowercase hexadecimal format:
+
+| Coin Type | Value | Description |
+|-----------|-------|-------------|
+| Ethereum | `'3c'` | Default coin type (60 in decimal) |
+| Bitcoin | `'0'` | Bitcoin addresses |
+| Litecoin | `'2'` | Litecoin addresses |
+| Bitcoin Cash | `'91'` | Bitcoin Cash addresses (145 in decimal) |
+
+**Examples:**
+```typescript
+// Ethereum (default)
+await resolver.resolveAddress(address, credential) // Uses '3c'
+await resolver.resolveAddress(address, credential, '3c') // Explicit
+
+// Bitcoin
+await resolver.resolveAddress(address, credential, '0')
+
+// Litecoin  
+await resolver.resolveAddress(address, credential, '2')
+
+// Bitcoin Cash
+await resolver.resolveAddress(address, credential, '91')
 ```
 
 ## Utility Functions

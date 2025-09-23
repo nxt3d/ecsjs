@@ -37,9 +37,10 @@ async function basicUsageExample() {
       console.log('   ❌ Not found')
     }
 
-    console.log('\n📍 Simple Mode - Resolving address-based credential...')
+    console.log('\n📍 Simple Mode - Resolving address-based credential (Ethereum)...')
     console.log('   Address: 0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
     console.log('   Credential: eth.ecs.ethstars.stars')
+    console.log('   Coin Type: 3c (Ethereum - default)')
     const simpleAddressResult = await simpleResolver.resolveAddress(
       '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
       'eth.ecs.ethstars.stars'
@@ -48,6 +49,21 @@ async function basicUsageExample() {
       console.log(`   ✅ Result: ${simpleAddressResult} stars`)
     } else {
       console.log('   ❌ Not found')
+    }
+
+    console.log('\n📍 Simple Mode - Resolving address-based credential (Bitcoin)...')
+    console.log('   Address: 0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
+    console.log('   Credential: eth.ecs.ethstars.stars')
+    console.log('   Coin Type: 0 (Bitcoin)')
+    const bitcoinAddressResult = await simpleResolver.resolveAddress(
+      '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      'eth.ecs.ethstars.stars',
+      '0' // Bitcoin coin type
+    )
+    if (bitcoinAddressResult !== null) {
+      console.log(`   ✅ Result: ${bitcoinAddressResult} stars`)
+    } else {
+      console.log('   ❌ Not found`)
     }
   } catch (error) {
     console.error('❌ Simple mode error:', error)
@@ -87,9 +103,10 @@ async function basicUsageExample() {
       }
     }
 
-    console.log('\n📍 Advanced Mode - Resolving address-based credential...')
+    console.log('\n📍 Advanced Mode - Resolving address-based credential (Ethereum)...')
     console.log('   Address: 0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
     console.log('   Credential: eth.ecs.ethstars.stars')
+    console.log('   Coin Type: 3c (Ethereum - default)')
     
     // Resolve an address-based credential
     const addressResult = await resolver.resolveAddressWithDetails(
@@ -113,8 +130,14 @@ async function basicUsageExample() {
       type: 'address',
       address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'
     })
+    const bitcoinENS = resolver.getENSName({
+      type: 'address',
+      address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      coinType: '0' // Bitcoin
+    })
     console.log('   Name → ENS:', nameENS)
-    console.log('   Address → ENS:', addressENS)
+    console.log('   Address (Ethereum) → ENS:', addressENS)
+    console.log('   Address (Bitcoin) → ENS:', bitcoinENS)
 
   } catch (error) {
     console.error('❌ Error:', error)

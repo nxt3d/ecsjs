@@ -23,15 +23,15 @@ export interface ResolverConfig {
 export interface Resolver {
   // Simple methods (return string | null)
   resolve(name: string, credential: string): Promise<string | null>
-  resolveAddress(address: string, credential: string): Promise<string | null>
+  resolveAddress(address: string, credential: string, coinType?: string): Promise<string | null>
   
   // Advanced methods (return full result objects)
   resolveWithDetails(name: string, credential: string): Promise<CredentialResolutionResult>
-  resolveAddressWithDetails(address: string, credential: string): Promise<CredentialResolutionResult>
+  resolveAddressWithDetails(address: string, credential: string, coinType?: string): Promise<CredentialResolutionResult>
   
   // Batch operations
   resolveBatch(requests: Array<{ name: string; credential: string }>): Promise<Array<string | null>>
-  resolveAddressBatch(requests: Array<{ address: string; credential: string }>): Promise<Array<string | null>>
+  resolveAddressBatch(requests: Array<{ address: string; credential: string; coinType?: string }>): Promise<Array<string | null>>
   
   // Utility methods
   getENSName(identifier: { type: 'name'; name: string } | { type: 'address'; address: string; coinType?: string }): string
@@ -76,8 +76,8 @@ export function createECSResolver(config: ResolverConfig): Resolver {
       return result.success ? result.value : null
     },
     
-    async resolveAddress(address: string, credential: string): Promise<string | null> {
-      const result = await resolver.resolveAddressCredential(address, credential)
+    async resolveAddress(address: string, credential: string, coinType?: string): Promise<string | null> {
+      const result = await resolver.resolveAddressCredential(address, credential, coinType)
       return result.success ? result.value : null
     },
     
@@ -86,8 +86,8 @@ export function createECSResolver(config: ResolverConfig): Resolver {
       return await resolver.resolveNameCredential(name, credential)
     },
     
-    async resolveAddressWithDetails(address: string, credential: string): Promise<CredentialResolutionResult> {
-      return await resolver.resolveAddressCredential(address, credential)
+    async resolveAddressWithDetails(address: string, credential: string, coinType?: string): Promise<CredentialResolutionResult> {
+      return await resolver.resolveAddressCredential(address, credential, coinType)
     },
     
     // Batch methods
@@ -101,9 +101,9 @@ export function createECSResolver(config: ResolverConfig): Resolver {
       return results.map((result: any) => result.success ? result.value : null)
     },
     
-    async resolveAddressBatch(requests: Array<{ address: string; credential: string }>): Promise<Array<string | null>> {
+    async resolveAddressBatch(requests: Array<{ address: string; credential: string; coinType?: string }>): Promise<Array<string | null>> {
       const batchRequests = requests.map(req => ({
-        identifier: { type: 'address' as const, address: req.address },
+        identifier: { type: 'address' as const, address: req.address, coinType: req.coinType },
         credentialKey: req.credential
       }))
       
