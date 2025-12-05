@@ -4,7 +4,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Version:** 0.2.1-beta  
+**Version:** 0.2.2-beta  
 **Status:** Beta - Deployed on Sepolia
 
 JavaScript/TypeScript library for interacting with **ECS V2** (Ethereum Credential Service), a decentralized registry for "known" credential resolvers. ECS V2 is fully compatible with the [ENS Hooks standard](https://github.com/nxt3d/ensips/blob/hooks/ensips/hooks.md), enabling ENS names to securely resolve credentials from trusted resolvers.
@@ -12,10 +12,10 @@ JavaScript/TypeScript library for interacting with **ECS V2** (Ethereum Credenti
 ## Installation
 
 ```bash
-npm install @nxt3d/ecsjs@0.2.1-beta
+npm install @nxt3d/ecsjs@0.2.2-beta
 ```
 
-> **Version:** 0.2.1-beta - [View on NPM](https://www.npmjs.com/package/@nxt3d/ecsjs)  
+> **Version:** 0.2.2-beta - [View on NPM](https://www.npmjs.com/package/@nxt3d/ecsjs)  
 > **Important:** ECS V1 is deprecated and incompatible with V2.  
 > **Note:** This package includes viem as a dependency, so you don't need to install it separately.
 
@@ -214,7 +214,7 @@ console.log(`Resolver is ${ageInDays} days old`)
 
 ### Sepolia Testnet
 
-**Version:** 0.2.1-beta  
+**Version:** 0.2.2-beta  
 **Date:** December 5, 2025  
 **Network:** Sepolia (Chain ID: 11155111)  
 **Status:** ✅ Live and operational (Deployment 03 - Minimal Clone Factory)
@@ -375,7 +375,7 @@ ECS V2 is a complete rewrite with a different architecture. Key differences:
 - Multi-currency support via coinType
 - Credential-first design
 
-### V2 (0.2.1-beta) - Current
+### V2 (0.2.2-beta) - Current
 - Simple flat registry (`label.ecs.eth`)
 - Standard ENS resolvers (ENSIP-10)
 - ENS Hooks integration
