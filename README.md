@@ -43,7 +43,7 @@ const client = createECSClient({
 })
 
 // Resolve a credential from a known resolver
-const resolverAddress = '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+const resolverAddress = '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
 const credential = await resolveCredential(
   client,
   resolverAddress,
@@ -71,7 +71,7 @@ console.log(resolverUpdated) // 1764948384n
 
 1. **User** sets a text record on their ENS name (e.g., `maria.eth`) containing a **Hook**:
    ```
-   hook("text(bytes32,string)", 0xB5D67A9bEf2052cC600f391A3997D46854cabC22)
+   hook("text(bytes32,string)", 0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa)
    ```
 
 2. **Client** reads this record and extracts the resolver address
@@ -117,7 +117,7 @@ Get information about a resolver from its address.
 ```typescript
 const { label, resolverUpdated } = await getResolverInfo(
   client,
-  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+  '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
 )
 ```
 
@@ -134,7 +134,7 @@ Resolve a credential from a known resolver.
 ```typescript
 const credential = await resolveCredential(
   client,
-  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+  '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
   'eth.ecs.name-stars.starts:vitalik.eth'
 )
 ```
@@ -154,7 +154,7 @@ Get the ECS Registry address for a given chain.
 import { getRegistryAddress } from '@nxt3d/ecsjs'
 
 const registryAddress = getRegistryAddress(11155111) // Sepolia
-// Returns: "0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec"
+// Returns: "0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77"
 ```
 
 ### `getResolverAge(resolverUpdated)`
@@ -200,15 +200,19 @@ if (ageInDays < 90) {
 **Version:** 0.2.0-beta  
 **Date:** December 5, 2025  
 **Network:** Sepolia (Chain ID: 11155111)  
-**Status:** ✅ Live and operational
+**Status:** ✅ Live and operational (Deployment 03 - Minimal Clone Factory)
 
 #### Deployed Contracts
 
 | Contract | Address | Verified |
 |----------|---------|----------|
-| ECS Registry | `0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec` | [✅ View](https://sepolia.etherscan.io/address/0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec) |
-| ECS Registrar | `0x47C680d3720dDc23250cF697466582829a0533Ce` | [✅ View](https://sepolia.etherscan.io/address/0x47C680d3720dDc23250cF697466582829a0533Ce) |
-| Credential Resolver (name-stars) | `0xB5D67A9bEf2052cC600f391A3997D46854cabC22` | [✅ View](https://sepolia.etherscan.io/address/0xB5D67A9bEf2052cC600f391A3997D46854cabC22) |
+| ECS Registry | `0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77` | [✅ View](https://sepolia.etherscan.io/address/0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77) |
+| ECS Registrar | `0x3f971176d86f223bB8A664F7ce006B818d1D5649` | [✅ View](https://sepolia.etherscan.io/address/0x3f971176d86f223bB8A664F7ce006B818d1D5649) |
+| Credential Resolver (Implementation) | `0x04c55c4CCAf0b7bb2e00bc3ea72a92585FE35683` | [✅ View](https://sepolia.etherscan.io/address/0x04c55c4CCAf0b7bb2e00bc3ea72a92585FE35683) |
+| Credential Resolver Factory | `0x3d9BFC750F1eb7EDaDA2DB0e5dE0F763c30446c1` | [✅ View](https://sepolia.etherscan.io/address/0x3d9bfc750f1eb7edada2db0e5de0f763c30446c1) |
+| Credential Resolver (Clone - name-stars) | `0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa` | [View](https://sepolia.etherscan.io/address/0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa) |
+
+> **New:** Resolver deployments now use EIP-1167 minimal clones, providing **91% gas savings** (1.98M gas → 169K gas per resolver)
 
 #### Configuration
 
@@ -224,7 +228,7 @@ if (ageInDays < 90) {
 
 - **Status:** ✅ Registered
 - **Owner:** `0xF8e03bd4436371E0e2F7C02E529b2172fe72b4EF`
-- **Resolver:** `0xB5D67A9bEf2052cC600f391A3997D46854cabC22`
+- **Resolver:** `0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa` (minimal clone)
 - **Expires:** December 5, 2026
 
 **Credential Records:**
@@ -246,7 +250,7 @@ const client = createECSClient({
 // Resolve credential directly
 const credential = await resolveCredential(
   client,
-  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+  '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
   'eth.ecs.name-stars.starts:vitalik.eth'
 )
 
@@ -269,7 +273,7 @@ const client = createECSClient({
   rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
 })
 
-const resolverAddress = '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+const resolverAddress = '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
 
 // Check resolver info first
 const { label, resolverUpdated } = await getResolverInfo(client, resolverAddress)
@@ -308,7 +312,7 @@ const client = createECSClient({
 // Get the label from resolver address
 const { label } = await getResolverInfo(
   client,
-  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+  '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
 )
 
 // Use Viem's getEnsText directly

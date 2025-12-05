@@ -37,7 +37,7 @@ async function hooksExample() {
     // Step 1: User has hook in their ENS record
     console.log('1️⃣  User has hook in ENS text record')
     const userEnsName = 'maria.eth'
-    const hookValue = 'hook("text(bytes32,string)", 0xB5D67A9bEf2052cC600f391A3997D46854cabC22)'
+    const hookValue = 'hook("text(bytes32,string)", 0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa)'
     
     console.log(`   ENS Name: ${userEnsName}`)
     console.log(`   Hook: ${hookValue}`)

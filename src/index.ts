@@ -18,7 +18,7 @@ export type { Chain, PublicClient }
 // Known ECS Registry addresses by chain
 const ECS_REGISTRY_ADDRESSES: Record<number, `0x${string}`> = {
   1: '0x0000000000000000000000000000000000000000', // Mainnet (not deployed yet)
-  11155111: '0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec' // Sepolia (Dec 5, 2025 - deployment 02)
+  11155111: '0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77' // Sepolia (Dec 5, 2025 - deployment 03)
 }
 
 /**
@@ -92,7 +92,7 @@ const ECS_REGISTRY_ABI = [
  * ```typescript
  * const { label, resolverUpdated } = await getResolverInfo(
  *   client,
- *   '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+ *   '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
  * )
  * // Returns: { label: "name-stars", resolverUpdated: 1764948384n }
  * 
@@ -145,7 +145,7 @@ export async function getResolverInfo(
  * ```typescript
  * const credential = await resolveCredential(
  *   client,
- *   '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+ *   '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
  *   'eth.ecs.name-stars.starts:vitalik.eth'
  * )
  * // Returns: "100"
@@ -179,7 +179,7 @@ export async function resolveCredential(
  * @example
  * ```typescript
  * const registryAddress = getRegistryAddress(11155111) // Sepolia
- * // Returns: "0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec"
+ * // Returns: "0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77"
  * ```
  */
 export function getRegistryAddress(chainId: number): `0x${string}` {

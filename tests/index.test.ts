@@ -40,7 +40,7 @@ describe('ecsjs V2', () => {
   describe('getRegistryAddress', () => {
     it('should return Sepolia registry address', () => {
       const address = getRegistryAddress(11155111)
-      expect(address).toBe('0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec')
+      expect(address).toBe('0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77')
     })
 
     it('should return zero address for mainnet (not deployed)', () => {
@@ -91,14 +91,14 @@ describe('ecsjs V2', () => {
 
       const result = await getResolverInfo(
         mockClient,
-        '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+        '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
       )
 
       expect(mockClient.readContract).toHaveBeenCalledWith({
-        address: '0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec',
+        address: '0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77',
         abi: expect.any(Array),
         functionName: 'getResolverInfo',
-        args: ['0xB5D67A9bEf2052cC600f391A3997D46854cabC22']
+        args: ['0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa']
       })
 
       expect(result).toEqual({
@@ -111,7 +111,7 @@ describe('ecsjs V2', () => {
       mockClient.chain = undefined as any
 
       await expect(
-        getResolverInfo(mockClient, '0xB5D67A9bEf2052cC600f391A3997D46854cabC22')
+        getResolverInfo(mockClient, '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa')
       ).rejects.toThrow('Client chain ID not available')
     })
 
@@ -119,7 +119,7 @@ describe('ecsjs V2', () => {
       mockClient.chain = { id: 1 } as any // Mainnet (not deployed)
 
       await expect(
-        getResolverInfo(mockClient, '0xB5D67A9bEf2052cC600f391A3997D46854cabC22')
+        getResolverInfo(mockClient, '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa')
       ).rejects.toThrow('ECS Registry not deployed on chain 1')
     })
   })
@@ -147,7 +147,7 @@ describe('ecsjs V2', () => {
 
       const result = await resolveCredential(
         mockClient,
-        '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+        '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
         'eth.ecs.name-stars.starts:vitalik.eth'
       )
 
@@ -169,7 +169,7 @@ describe('ecsjs V2', () => {
 
       const result = await resolveCredential(
         mockClient,
-        '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+        '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
         'eth.ecs.name-stars.nonexistent:test.eth'
       )
 
@@ -186,7 +186,7 @@ describe('ecsjs V2', () => {
 
       await resolveCredential(
         mockClient,
-        '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+        '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa',
         'some.credential.key'
       )
 
