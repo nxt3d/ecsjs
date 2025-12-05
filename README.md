@@ -1,357 +1,324 @@
-# ecs.js
+# ecsjs - Ethereum Credential Service V2
 
-
+[![npm version](https://img.shields.io/npm/v/@nxt3d/ecsjs.svg)](https://www.npmjs.com/package/@nxt3d/ecsjs)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A TypeScript library for resolving **ECS (Ethereum Credential Service)** credentials using [Viem](https://viem.sh/). This library provides a simple, type-safe interface to query credentials stored in the ECS system through ENS (Ethereum Name Service) text records.
+**Version:** 0.2.0-beta  
+**Status:** Beta - Deployed on Sepolia
 
-## What is ECS?
+A JavaScript library for interacting with **ECS V2** (Ethereum Credential Service), a decentralized registry for known credential resolvers. ECS V2 is fully compatible with the [ENS Hooks standard](https://github.com/nxt3d/ensips/blob/hooks/ensips/hooks.md), enabling ENS names to securely resolve credentials from trusted resolvers.
 
-ECS (Ethereum Credential Service) is a decentralized protocol built on Ethereum for storing, retrieving, and verifying digital credentials. It enables applications to create custom credentials with guaranteed namespace ownership and flexible on-chain/off-chain data storage.
+## What is ECS V2?
 
-**⚠️ Important**: ECS is currently deployed on **Ethereum Sepolia testnet** only. This library is designed to work with the testnet deployment.
+**ECS V2** is a simplified, decentralized registry that maps labels (e.g., `name-stars`) to standard ENS resolvers. These resolvers serve verifiable credential data, either onchain or offchain (via CCIP-Read).
 
-**Example**: Query how many "stars" `vitalik.eth` has received using the credential `eth.ecs.ethstars.stars` (currently returns "2" on Sepolia testnet).
+### Key Features
 
-## Features
-
-- 🚀 **Simple Interface**: Easy-to-use methods for resolving credentials
-- 🔧 **Viem Integration**: Built on top of the popular Viem library
-- 📝 **TypeScript Support**: Full type safety and IntelliSense
-- 🎯 **Multiple Identifier Types**: Support for both name-based and address-based credentials
-- 🪙 **Multi-Currency Support**: Support for different coin types (Ethereum, Bitcoin, Litecoin, Bitcoin Cash)
-- 🔄 **Batch Resolution**: Resolve multiple credentials efficiently
-- ⚡ **Error Handling**: Comprehensive error handling with custom error types
-- 📦 **Dual Package**: Supports both CommonJS and ES modules
+- 🎯 **Simple Registry**: Flat, single-label registry - no complex hierarchies
+- 🔗 **ENS Hooks Compatible**: Designed for the ENS Hooks standard
+- 🛡️ **Resolver Trust**: Track resolver age and enforce security policies
+- 📦 **Standard Resolvers**: Uses standard ENSIP-10 Extended Resolvers
+- 🌐 **Flexible Data**: Providers define their own schemas and keys
+- ⚡ **Built on Viem**: Modern, type-safe Ethereum interactions
 
 ## Installation
-
-Install the package from npm:
 
 ```bash
 npm install @nxt3d/ecsjs
 ```
 
-**Note**: `viem` is a peer dependency and will be installed automatically if not already present.
+> **Important:** This is version 0.2.0-beta of ECS V2. ECS V1 (0.1.x) is deprecated and incompatible.  
+> **Note:** Viem is included as a dependency, no need to install separately.
 
 ## Quick Start
 
-### Main API
-
 ```typescript
-import { createECSResolver } from '@nxt3d/ecsjs'
+import { createECSClient, sepolia, getResolverInfo, resolveCredential } from '@nxt3d/ecsjs'
 
-// Simple mode - just specify the network
-const resolver = createECSResolver({ network: 'sepolia' })
+// Create a client
+const client = createECSClient({
+  chain: sepolia,
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
+})
 
-// Resolve by name
-const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
-console.log(stars) // e.g., "2"
-
-// Resolve by address (Ethereum - default)
-const addressStars = await resolver.resolveAddress(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars'
+// Resolve a credential from a known resolver
+const resolverAddress = '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+const credential = await resolveCredential(
+  client,
+  resolverAddress,
+  'eth.ecs.name-stars.starts:vitalik.eth'
 )
-console.log(addressStars) // e.g., "2"
+console.log(credential) // "100"
 
-// Resolve by address with specific coin type
-const bitcoinStars = await resolver.resolveAddress(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars',
-  '0' // Bitcoin coin type
-)
-console.log(bitcoinStars) // e.g., "1"
-
-// Advanced mode - use your existing viem client
-const advancedResolver = createECSResolver({ publicClient })
-
-// Get detailed results
-const details = await advancedResolver.resolveWithDetails('vitalik.eth', 'eth.ecs.ethstars.stars')
-console.log(details) // { value: "2", ensName: "...", success: true }
+// Get resolver information (for security checks)
+const { label, resolverUpdated } = await getResolverInfo(client, resolverAddress)
+console.log(label) // "name-stars"
+console.log(resolverUpdated) // 1764948384n
 ```
 
-**Note**: For production use, provide your own RPC URL. The library doesn't load environment variables - that's your responsibility:
+## Architecture
+
+### How ECS V2 Works
+
+1. **Registry**: The `ECSRegistry` contract maintains a mapping of labels to resolver addresses
+2. **ENS Integration**: Each label automatically gets a subdomain (e.g., `name-stars.ecs.eth`)
+3. **Standard Resolvers**: Resolvers implement standard ENS interfaces (`text`, `addr`, etc.)
+4. **One-to-One Mapping**: Each label maps to exactly one resolver (can be updated by owner)
+5. **Hooks Integration**: ENS names use Hooks to reference ECS resolvers
+
+### Usage Flow with Hooks
+
+1. **User** sets a text record on their ENS name (e.g., `maria.eth`) containing a **Hook**:
+   ```
+   hook("text(bytes32,string)", 0xB5D67A9bEf2052cC600f391A3997D46854cabC22)
+   ```
+
+2. **Client** reads this record and extracts the resolver address
+
+3. **Client** calls `getResolverInfo(resolverAddress)` to:
+   - Find its registered label (e.g., `name-stars`)
+   - Check the `resolverUpdated` timestamp
+   - Make a trust decision based on resolver age
+
+4. **Client** constructs the service name `name-stars.ecs.eth` (optional, for provenance)
+
+5. **Client** queries the resolver directly for credentials
+
+6. **Resolver** returns the verified credential data
+
+This creates a trusted link where `maria.eth` doesn't store the credential herself; instead, it's resolved against a "known" trusted resolver.
+
+## API Reference
+
+### `createECSClient(config)`
+
+Creates a Viem public client configured for ECS.
+
 ```typescript
-import 'dotenv/config' // Load environment variables in your app
-const resolver = createECSResolver({ 
-  network: 'sepolia',
-  rpcUrl: process.env.SEPOLIA_RPC_URL 
+import { createECSClient, sepolia } from '@nxt3d/ecsjs'
+
+const client = createECSClient({
+  chain: sepolia,
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
 })
 ```
 
-## Usage
+**Parameters:**
+- `config.chain`: Chain to connect to (`sepolia` or `mainnet`)
+- `config.rpcUrl`: RPC URL for the chain
 
-### Main API
+**Returns:** Viem `PublicClient`
 
-#### `createECSResolver(config)`
+### `getResolverInfo(client, resolverAddress)`
 
-Creates an ECS resolver that adapts based on your configuration.
+Get information about a resolver from its address.
 
 ```typescript
-import { createECSResolver } from '@nxt3d/ecsjs'
-
-// Simple mode - just specify the network
-const resolver = createECSResolver({ network: 'sepolia' })
-
-// With custom RPC URL
-const resolver = createECSResolver({ 
-  network: 'sepolia',
-  rpcUrl: process.env.SEPOLIA_RPC_URL // Load environment variables in your app
-})
-
-// Advanced mode - use your existing viem client
-const resolver = createECSResolver({ publicClient })
+const { label, resolverUpdated } = await getResolverInfo(
+  client,
+  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+)
 ```
 
-#### Resolver Methods
+**Parameters:**
+- `client`: Viem public client
+- `resolverAddress`: The resolver address
+
+**Returns:** `Promise<{ label: string, resolverUpdated: bigint }>`
+
+### `resolveCredential(client, resolverAddress, credentialKey)`
+
+Resolve a credential from a known resolver.
 
 ```typescript
-// Simple methods (return string | null)
-const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
-const addressStars = await resolver.resolveAddress(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars'
+const credential = await resolveCredential(
+  client,
+  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+  'eth.ecs.name-stars.starts:vitalik.eth'
 )
-const bitcoinStars = await resolver.resolveAddress(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars',
-  '0' // Bitcoin coin type
-)
-
-// Advanced methods (return full result objects)
-const details = await resolver.resolveWithDetails('vitalik.eth', 'eth.ecs.ethstars.stars')
-// Returns: { value: "2", ensName: "...", credentialKey: "...", success: true }
-
-const addressDetails = await resolver.resolveAddressWithDetails(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars'
-)
-const bitcoinDetails = await resolver.resolveAddressWithDetails(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars',
-  '0' // Bitcoin coin type
-)
-
-// Batch operations for efficiency
-const batchResults = await resolver.resolveBatch([
-  { name: 'vitalik.eth', credential: 'eth.ecs.ethstars.stars' },
-  { name: 'alice.eth', credential: 'eth.ecs.ethstars.stars' }
-])
-
-const addressBatchResults = await resolver.resolveAddressBatch([
-  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars' },
-  { address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045', credential: 'eth.ecs.ethstars.stars', coinType: '0' }
-])
-
-// Utility methods
-const ensName = resolver.getENSName({ type: 'name', name: 'vitalik.eth' })
-// "vitalik.eth.name.ecs.eth"
 ```
 
-### Supported Coin Types
+**Parameters:**
+- `client`: Viem public client
+- `resolverAddress`: The resolver address
+- `credentialKey`: The credential key to resolve
 
-The library supports multiple cryptocurrency coin types for address-based credential resolution. Coin types are specified using their SLIP-0044 values in lowercase hexadecimal format:
+**Returns:** `Promise<string | null>`
 
-| Coin Type | Value | Description |
-|-----------|-------|-------------|
-| Ethereum | `'3c'` | Default coin type (60 in decimal) |
-| Bitcoin | `'0'` | Bitcoin addresses |
-| Litecoin | `'2'` | Litecoin addresses |
-| Bitcoin Cash | `'91'` | Bitcoin Cash addresses (145 in decimal) |
+### `getRegistryAddress(chainId)`
 
-**Examples:**
+Get the ECS Registry address for a given chain.
+
 ```typescript
-// Ethereum (default)
-await resolver.resolveAddress(address, credential) // Uses '3c'
-await resolver.resolveAddress(address, credential, '3c') // Explicit
+import { getRegistryAddress } from '@nxt3d/ecsjs'
 
-// Bitcoin
-await resolver.resolveAddress(address, credential, '0')
-
-// Litecoin  
-await resolver.resolveAddress(address, credential, '2')
-
-// Bitcoin Cash
-await resolver.resolveAddress(address, credential, '91')
+const registryAddress = getRegistryAddress(11155111) // Sepolia
+// Returns: "0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec"
 ```
 
-## Utility Functions
+### `getResolverAge(resolverUpdated)`
 
-The library also exports utility functions for working with identifiers and credential keys:
+Calculate the age of a resolver in seconds (helper for security checks).
 
 ```typescript
-import {
-  createNameIdentifier,
-  createAddressIdentifier,
-  normalizeAddress,
-  normalizeName,
-  constructENSName,
-  validateCredentialKey
-} from '@nxt3d/ecsjs'
+import { getResolverAge } from '@nxt3d/ecsjs'
 
-// Create identifiers
-const nameId = createNameIdentifier('vitalik.eth')
-const addressId = createAddressIdentifier('0xd8da6bf26964af9d7eed9e03e53415d37aa96045')
-
-// Normalize inputs
-const normalizedAddr = normalizeAddress('0xD8DA6BF26964AF9D7EED9E03E53415D37AA96045')
-// "d8da6bf26964af9d7eed9e03e53415d37aa96045"
-
-// Construct ECS ENS names
-const ensName = constructENSName(nameId)
-// "vitalik.eth.name.ecs.eth"
-
-
+const { resolverUpdated } = await getResolverInfo(client, resolverAddress)
+const age = getResolverAge(resolverUpdated)
+const ageInDays = Math.floor(age / 86400)
+console.log(`Resolver is ${ageInDays} days old`)
 ```
 
-## Error Handling
+## Resolver Trust and Security
 
-The library provides comprehensive error handling with both simple and detailed result methods:
+**ECS V2 enforces a one-to-one relationship between labels and resolvers.** While owners can update resolvers (for upgrades), recent changes may indicate security concerns.
 
-### Simple Error Handling
+### Checking Resolver Age
 
 ```typescript
-import { createECSResolver } from '@nxt3d/ecsjs'
+const { label, resolverUpdated } = await getResolverInfo(client, resolverAddress)
+const resolverAge = getResolverAge(resolverUpdated)
+const ageInDays = Math.floor(resolverAge / 86400)
 
-const resolver = createECSResolver({ network: 'sepolia' })
-
-// Simple methods return null for failed resolution
-const result = await resolver.resolve('nonexistent.eth', 'eth.ecs.ethstars.stars')
-if (result === null) {
-  console.log('Credential not found')
-}
-
-// Get detailed error information
-const details = await resolver.resolveWithDetails('nonexistent.eth', 'eth.ecs.ethstars.stars')
-if (!details.success) {
-  console.log('Error:', details.error)
+// Enforce 90-day minimum age for high-security applications
+if (ageInDays < 90) {
+  console.warn(`⚠️ Resolver for "${label}" changed ${ageInDays} days ago`)
+  // Reject or require security review
 }
 ```
 
-### Advanced Error Handling
+**Security-conscious clients can require resolvers to be established (e.g., 90+ days old) before trusting them.** Recent resolver changes may indicate:
+- Compromise
+- Untested deployments
+- Migrations requiring review
 
-```typescript
-import {
-  ECSError,
-  InvalidIdentifierError,
-  InvalidCredentialKeyError,
-  ResolutionTimeoutError,
-  ENSResolutionError
-} from '@nxt3d/ecsjs'
+## Deployments
 
-try {
-  const result = await resolver.resolveWithDetails(
-    'vitalik.eth',
-    'eth.ecs.ethstars.stars'
-  )
-  if (!result.success) {
-    console.log('Resolution failed:', result.error)
-  }
-} catch (error) {
-  if (error instanceof InvalidIdentifierError) {
-    console.log('Invalid identifier:', error.message)
-  } else if (error instanceof ENSResolutionError) {
-    console.log('ENS resolution failed:', error.message)
-  }
-  // ... handle other error types
-}
-```
+### Sepolia Testnet
+
+**Version:** 0.2.0-beta  
+**Date:** December 5, 2025  
+**Network:** Sepolia (Chain ID: 11155111)  
+**Status:** ✅ Live and operational
+
+#### Deployed Contracts
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| ECS Registry | `0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec` | [✅ View](https://sepolia.etherscan.io/address/0x2bA1277bD3f5638F605696cb974eD67Ef81767Ec) |
+| ECS Registrar | `0x47C680d3720dDc23250cF697466582829a0533Ce` | [✅ View](https://sepolia.etherscan.io/address/0x47C680d3720dDc23250cF697466582829a0533Ce) |
+| Credential Resolver (name-stars) | `0xB5D67A9bEf2052cC600f391A3997D46854cabC22` | [✅ View](https://sepolia.etherscan.io/address/0xB5D67A9bEf2052cC600f391A3997D46854cabC22) |
+
+#### Configuration
+
+- **Root Name:** `ecs.eth`
+- **Root Node:** `0xe436ba58406c69a63a9611a11eb52314c5c17ba9eaaa7dab8506fe8849517286`
+- **Deployer:** `0xF8e03bd4436371E0e2F7C02E529b2172fe72b4EF`
+- **Registrar Pricing:** ~0.001 ETH/year (32000 wei/second)
+- **Min Commitment Age:** 60 seconds
+
+#### Registered Labels
+
+##### name-stars.ecs.eth
+
+- **Status:** ✅ Registered
+- **Owner:** `0xF8e03bd4436371E0e2F7C02E529b2172fe72b4EF`
+- **Resolver:** `0xB5D67A9bEf2052cC600f391A3997D46854cabC22`
+- **Expires:** December 5, 2026
+
+**Credential Records:**
+- **Key:** `eth.ecs.name-stars.starts:vitalik.eth`
+- **Value:** `"100"`
 
 ## Examples
 
-### Basic Usage
+### Basic Credential Resolution
 
 ```typescript
-import 'dotenv/config'
-import { createECSResolver } from '@nxt3d/ecsjs'
+import { createECSClient, sepolia, resolveCredential } from '@nxt3d/ecsjs'
 
-// Create a resolver in simple mode
-const resolver = createECSResolver({ network: 'sepolia' })
-
-// Resolve by name
-const stars = await resolver.resolve('vitalik.eth', 'eth.ecs.ethstars.stars')
-
-// Resolve by address
-const addressStars = await resolver.resolveAddress(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars'
-)
-
-console.log('Stars:', stars)
-console.log('Address stars:', addressStars)
-```
-
-### Advanced Usage
-
-```typescript
-import 'dotenv/config'
-import { createPublicClient, http } from 'viem'
-import { sepolia } from 'viem/chains'
-import { createECSResolver } from '@nxt3d/ecsjs'
-
-// Custom viem configuration
-const publicClient = createPublicClient({
+const client = createECSClient({
   chain: sepolia,
-  transport: http(process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo')
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
 })
 
-// Advanced resolver with custom options
-const resolver = createECSResolver({ 
-  publicClient,
-  ecsDomain: 'custom.ecs.eth' // Custom ECS domain
-})
-
-// Get detailed results
-const nameResult = await resolver.resolveWithDetails(
-  'vitalik.eth',
-  'eth.ecs.ethstars.stars'
+// Resolve credential directly
+const credential = await resolveCredential(
+  client,
+  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22',
+  'eth.ecs.name-stars.starts:vitalik.eth'
 )
 
-const addressResult = await resolver.resolveAddressWithDetails(
-  '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
-  'eth.ecs.ethstars.stars'
-)
-
-console.log('Name stars:', nameResult.value)
-console.log('Address stars:', addressResult.value)
+console.log(`vitalik.eth has ${credential} stars`)
 ```
 
-### Batch Resolution
+### With Security Checks
 
 ```typescript
-// Resolve multiple credentials efficiently
-const batchResults = await resolver.resolveBatch([
-  { name: 'vitalik.eth', credential: 'eth.ecs.ethstars.stars' },
-  { name: 'alice.eth', credential: 'eth.ecs.ethstars.stars' }
-])
+import { 
+  createECSClient, 
+  sepolia, 
+  getResolverInfo,
+  getResolverAge,
+  resolveCredential 
+} from '@nxt3d/ecsjs'
 
-batchResults.forEach((result, index) => {
-  if (result !== null) {
-    console.log(`Request ${index + 1}: ${result} stars`)
-  } else {
-    console.log(`Request ${index + 1}: Failed`)
-  }
+const client = createECSClient({
+  chain: sepolia,
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
 })
+
+const resolverAddress = '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
+
+// Check resolver info first
+const { label, resolverUpdated } = await getResolverInfo(client, resolverAddress)
+const ageInDays = Math.floor(getResolverAge(resolverUpdated) / 86400)
+
+console.log(`Resolver: ${label}.ecs.eth`)
+console.log(`Age: ${ageInDays} days`)
+
+// Enforce security policy
+if (ageInDays < 90) {
+  throw new Error(`Resolver too new: ${ageInDays} days (require 90+)`)
+}
+
+// Proceed with resolution
+const credential = await resolveCredential(
+  client,
+  resolverAddress,
+  'eth.ecs.name-stars.starts:vitalik.eth'
+)
+
+console.log(`Credential: ${credential}`)
 ```
 
-### Custom Configuration
+### Using Viem Directly
+
+Since ECS V2 uses standard ENS resolvers, you can also use Viem's ENS functions directly:
 
 ```typescript
-// Use your existing viem client
-const resolver = createECSResolver({ 
-  publicClient: mainnetClient,
-  ecsDomain: 'ecs.eth'
+import { createECSClient, sepolia, getResolverInfo } from '@nxt3d/ecsjs'
+
+const client = createECSClient({
+  chain: sepolia,
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY'
 })
 
-const result = await resolver.resolveWithDetails(
-  'vitalik.eth',
-  'eth.ecs.ethstars.stars'
+// Get the label from resolver address
+const { label } = await getResolverInfo(
+  client,
+  '0xB5D67A9bEf2052cC600f391A3997D46854cabC22'
 )
-```
 
-**Note**: The examples use Alchemy demo RPC URLs for simplicity. For production use, provide your own RPC URL. The library doesn't load environment variables - that's your responsibility.
+// Use Viem's getEnsText directly
+const ensName = `${label}.ecs.eth`
+const textValue = await client.getEnsText({
+  name: ensName,
+  key: 'eth.ecs.name-stars.starts:vitalik.eth'
+})
+
+console.log(textValue) // "100"
 ```
 
 ## Development
@@ -365,25 +332,9 @@ npm run build
 ### Testing
 
 ```bash
-# Unit tests
 npm test
 npm run test:watch
 npm run test:coverage
-
-# Onchain tests (requires .env with SEPOLIA_RPC_URL)
-npm run test:onchain
-```
-
-### Test Structure
-
-```
-ecsjs/
-├── src/                    # Source code
-├── tests/                  # All tests
-│   ├── utils.test.ts      # Unit tests for utilities
-│   ├── resolver.test.ts   # Unit tests for resolver
-│   └── onchain.test.js    # Onchain tests with real ECS credentials
-└── examples/              # Usage examples
 ```
 
 ### Linting
@@ -392,6 +343,24 @@ ecsjs/
 npm run lint
 npm run lint:fix
 ```
+
+## Migration from V1
+
+ECS V2 is a complete rewrite with a different architecture. Key differences:
+
+### V1 (0.1.x) - Deprecated
+- Complex multi-level registry (name.coinType.addr.ecs.eth)
+- Custom credential resolution
+- Multi-currency support via coinType
+- Credential-first design
+
+### V2 (0.2.0-beta) - Current
+- Simple flat registry (label.ecs.eth)
+- Standard ENS resolvers
+- ENS Hooks integration
+- Resolver-first design with trust tracking
+
+**Migration is not automatic.** V2 requires new resolver deployments and a different integration approach. If you're using V1, please reach out for migration guidance.
 
 ## Contributing
 
@@ -403,10 +372,11 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Links
 
-- [ECS Protocol Repository](https://github.com/nxt3d/ecs)
+- [ECS V2 Protocol Repository](https://github.com/nxt3d/ecs)
+- [ENS Hooks Standard](https://github.com/nxt3d/ensips/blob/hooks/ensips/hooks.md)
 - [Viem Documentation](https://viem.sh/)
 - [ENS Documentation](https://docs.ens.domains/)
 
 ---
 
-**Note**: ECS is currently in beta on Ethereum Sepolia testnet. The library has been tested with real credentials and works correctly. Use at your own risk in production environments.
+**Note**: ECS V2 is currently in beta on Ethereum Sepolia testnet. The library has been tested with real deployments and works correctly. Use at your own risk in production environments.

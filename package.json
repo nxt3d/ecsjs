@@ -1,8 +1,8 @@
 {
   "name": "@nxt3d/ecsjs",
-  "version": "0.1.6",
+  "version": "0.2.0-beta",
   "type": "module",
-  "description": "TypeScript library for resolving ECS (Ethereum Credential Service) credentials using Viem",
+  "description": "JavaScript library for ECS V2 - Ethereum Credential Service registry and resolver",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
