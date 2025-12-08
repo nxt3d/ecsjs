@@ -40,7 +40,7 @@ describe('ecsjs V2', () => {
   describe('getRegistryAddress', () => {
     it('should return Sepolia registry address', () => {
       const address = getRegistryAddress(11155111)
-      expect(address).toBe('0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77')
+      expect(address).toBe('0xb09C149664773bFA88B72FA41437AdADcB8bF5B4')
     })
 
     it('should return zero address for mainnet (not deployed)', () => {
@@ -86,7 +86,8 @@ describe('ecsjs V2', () => {
     it('should query the registry contract', async () => {
       vi.mocked(mockClient.readContract).mockResolvedValue([
         'name-stars',
-        BigInt(1764948384)
+        BigInt(1764948384),
+        ''
       ] as any)
 
       const result = await getResolverInfo(
@@ -95,7 +96,7 @@ describe('ecsjs V2', () => {
       )
 
       expect(mockClient.readContract).toHaveBeenCalledWith({
-        address: '0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77',
+        address: '0xb09C149664773bFA88B72FA41437AdADcB8bF5B4',
         abi: expect.any(Array),
         functionName: 'getResolverInfo',
         args: ['0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa']
@@ -103,7 +104,8 @@ describe('ecsjs V2', () => {
 
       expect(result).toEqual({
         label: 'name-stars',
-        resolverUpdated: BigInt(1764948384)
+        resolverUpdated: BigInt(1764948384),
+        review: ''
       })
     })
 
@@ -139,7 +141,8 @@ describe('ecsjs V2', () => {
       // Mock getResolverInfo response
       vi.mocked(mockClient.readContract).mockResolvedValue([
         'name-stars',
-        BigInt(1764948384)
+        BigInt(1764948384),
+        ''
       ] as any)
 
       // Mock ENS text resolution
@@ -162,7 +165,8 @@ describe('ecsjs V2', () => {
     it('should return null if credential not found', async () => {
       vi.mocked(mockClient.readContract).mockResolvedValue([
         'name-stars',
-        BigInt(1764948384)
+        BigInt(1764948384),
+        ''
       ] as any)
 
       vi.mocked(mockClient.getEnsText).mockResolvedValue(null)
@@ -179,7 +183,8 @@ describe('ecsjs V2', () => {
     it('should construct correct ENS name from label', async () => {
       vi.mocked(mockClient.readContract).mockResolvedValue([
         'custom-service',
-        BigInt(1234567890)
+        BigInt(1234567890),
+        ''
       ] as any)
 
       vi.mocked(mockClient.getEnsText).mockResolvedValue('result')

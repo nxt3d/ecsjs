@@ -1,6 +1,6 @@
 {
   "name": "@nxt3d/ecsjs",
-  "version": "0.2.2-beta",
+  "version": "0.2.3-beta",
   "type": "module",
   "description": "JavaScript library for ECS V2 - Ethereum Credential Service registry and resolver",
   "main": "dist/index.js",

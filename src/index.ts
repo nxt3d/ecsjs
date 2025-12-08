@@ -1,6 +1,6 @@
 /**
  * ecsjs - Ethereum Credential Service JavaScript Library
- * Version 0.2.0-beta - ECS V2
+ * Version 0.2.3-beta - ECS V2
  * 
  * A simple library for interacting with ECS V2, a decentralized registry
  * for known credential resolvers compatible with ENS Hooks.
@@ -18,7 +18,7 @@ export type { Chain, PublicClient }
 // Known ECS Registry addresses by chain
 const ECS_REGISTRY_ADDRESSES: Record<number, `0x${string}`> = {
   1: '0x0000000000000000000000000000000000000000', // Mainnet (not deployed yet)
-  11155111: '0x4f2F0e7b61d9Bd0e30F186D6530Efc92429Fcc77' // Sepolia (Dec 5, 2025 - deployment 03)
+  11155111: '0xb09C149664773bFA88B72FA41437AdADcB8bF5B4' // Sepolia (Dec 7, 2025 - deployment 01 - Resolver Review System)
 }
 
 /**
@@ -39,6 +39,8 @@ export interface ResolverInfo {
   label: string
   /** Timestamp when the resolver was last updated */
   resolverUpdated: bigint
+  /** Admin-assigned review status or certification (e.g., "verified", "audited") */
+  review: string
 }
 
 /**
@@ -72,7 +74,8 @@ const ECS_REGISTRY_ABI = [
     inputs: [{ name: 'resolver_', type: 'address' }],
     outputs: [
       { name: 'label', type: 'string' },
-      { name: 'resolverUpdated', type: 'uint128' }
+      { name: 'resolverUpdated', type: 'uint128' },
+      { name: 'review', type: 'string' }
     ]
   }
 ] as const
@@ -85,21 +88,26 @@ const ECS_REGISTRY_ABI = [
  * 
  * @param client - Viem public client
  * @param resolverAddress - The resolver address
- * @returns The resolver info { label, resolverUpdated }
+ * @returns The resolver info { label, resolverUpdated, review }
  * @throws Error if ECS Registry is not deployed on the chain
  * 
  * @example
  * ```typescript
- * const { label, resolverUpdated } = await getResolverInfo(
+ * const { label, resolverUpdated, review } = await getResolverInfo(
  *   client,
  *   '0x9773397bd9366D80dAE708CA4C4413Abf88B3DAa'
  * )
- * // Returns: { label: "name-stars", resolverUpdated: 1764948384n }
+ * // Returns: { label: "name-stars", resolverUpdated: 1764948384n, review: "" }
  * 
  * // Check resolver age for security
  * const resolverAge = Math.floor(Date.now() / 1000) - Number(resolverUpdated)
  * if (resolverAge < 90 * 24 * 60 * 60) {
  *   console.warn('Resolver changed recently')
+ * }
+ * 
+ * // Check admin review status
+ * if (review && review !== "verified") {
+ *   console.warn(`Resolver review status: ${review}`)
  * }
  * ```
  */
@@ -119,14 +127,14 @@ export async function getResolverInfo(
     throw new Error(`ECS Registry not deployed on chain ${chainId}`)
   }
   
-  const [label, resolverUpdated] = await client.readContract({
+  const [label, resolverUpdated, review] = await client.readContract({
     address: registryAddress,
     abi: ECS_REGISTRY_ABI,
     functionName: 'getResolverInfo',
     args: [resolverAddress]
   })
   
-  return { label, resolverUpdated }
+  return { label, resolverUpdated, review }
 }
 
 /**
