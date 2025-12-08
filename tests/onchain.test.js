@@ -17,7 +17,7 @@ dotenv.config()
  */
 
 const main = async () => {
-  console.log("🌟 ECS Onchain Integration Test - v0.2.3-beta");
+  console.log("🌟 ECS Onchain Integration Test - v0.2.4-beta");
   console.log("==============================================\n");
   
   if (!process.env.SEPOLIA_RPC_URL) {

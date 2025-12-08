@@ -1,6 +1,6 @@
 /**
  * ecsjs - Ethereum Credential Service JavaScript Library
- * Version 0.2.3-beta - ECS V2
+ * Version 0.2.4-beta - ECS V2
  * 
  * A simple library for interacting with ECS V2, a decentralized registry
  * for known credential resolvers compatible with ENS Hooks.
